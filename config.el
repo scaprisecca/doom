@@ -42,7 +42,7 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Sync/Notes/org-notes/")
 (setq org-archive-location "~/Sync/Notes/org-notes/done-list.org::")
-(setq org-default-notes-file "~/Sync/Notes/org-notes/_inbox.org")
+(setq org-default-notes-file "~/Sync/Notes/org-notes/inbox.org")
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -95,11 +95,11 @@
 (after! org
   (setq org-capture-templates
         `(("i" "Inbox"
-           entry (file "~/Sync/Notes/org-notes/_inbox.org")
+           entry (file "~/Sync/Notes/org-notes/inbox.org")
            "* %?\n%U\n\n  %i"
            :kill-buffer t)
           ("t" "Todo"
-           entry (file "~/Sync/Notes/org-notes/_inbox.org")
+           entry (file "~/Sync/Notes/org-notes/inbox.org")
            "* TODO %?\n%U\n\n  %i"
            :kill-buffer t)
           ("l" "Captain Log Entry"
@@ -111,7 +111,7 @@
            "* %?"
            :kill-buffer t)
           ("m" "Meeting"
-           entry (file+headline "/Users/thomas/OneDrive/org-roam/agenda.org" "Future")
+           entry (file+headline "~/Sync/Notes/org-notes/inbox.org" "Future")
            ,(concat "* TODO %? :meeting:\n" "<%<%Y-%m-%d %a %H:00>>"))
           ("o" "Open Question Thesis"
            entry (file+headline "~/OneDrive/org-roam/openquestions.org" "Questions")
@@ -119,16 +119,23 @@
   (set-face-attribute 'org-headline-done nil :strike-through t)
   )
 
-;; Set Org Todo Keywords
-(after! org
-  (setq org-todo-keywords
-        '((sequence
-           "TODO(t)"  ; A task that eventually needs to be completed (aka Backlog)
-           "NEXT(n)"  ; Tasks next in line to be done - within the next week
-           "WAIT(w@/!)"  ; Something that is holding up this task from being completed. Add notes for this status
-           "|"
-           "DONE(d/!)"  ; Task that has been completed
-           "CANCELLED(c@/!)" ))))
+
+;; == Custom State Keywords ==
+(setq org-use-fast-todo-selection t)
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "|" "DONE(d)")
+	(sequence "WAITING(w@/!)" "INACTIVE(i)" "SOMEDAY(s)" "|" "CANCELLED(c@/!)")))
+
+;; Custom colors for the keywords
+(setq org-todo-keyword-faces
+      '(("TODO" :foreground "red" :weight bold)
+	("NEXT" :foreground "blue" :weight bold)
+	("PROJ" :foreground "magenta" :weight bold)
+	("DONE" :foreground "forest green" :weight bold)
+	("WAITING" :foreground "orange" :weight bold)
+	("INACTIVE" :foreground "magenta" :weight bold)
+	("SOMEDAY" :foreground "cyan" :weight bold)
+	("CANCELLED" :foreground "forest green" :weight bold)))
 
 ;; Set Tags
 (after! org
@@ -145,7 +152,6 @@
 ;; Org Agenda Deadline Warning
 ;;(setq org-deadline-warning-days 1)
 ;; Org Agendas
-(setq org-log-done 'time)
 (setq org-agenda-start-with-log-mode t)
 
 (setq org-agenda-custom-commands
