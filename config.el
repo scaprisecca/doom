@@ -43,6 +43,7 @@
 (setq org-directory "~/Sync/Notes/org-notes/")
 (setq org-archive-location "~/Sync/Notes/org-notes/done-list.org::")
 (setq org-default-notes-file "~/Sync/Notes/org-notes/inbox.org")
+(setq org-roam-directory "~/Sync/Notes/org-roam/")
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -75,9 +76,13 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-;;
+
+
 ;; Org Mode Customizations
-;;
+
+;; Set Org Modern
+(with-eval-after-load 'org (global-org-modern-mode))
+
 ;; Hide bold, italic, code symbols
 (setq org-hide-emphasis-markers t)
 
@@ -123,19 +128,19 @@
 ;; == Custom State Keywords ==
 (setq org-use-fast-todo-selection t)
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "|" "DONE(d)")
-	(sequence "WAITING(w@/!)" "INACTIVE(i)" "SOMEDAY(s)" "|" "CANCELLED(c@/!)")))
+      '((sequence "TODO(t)" "NEXT(n)" "PROG(p)" "|" "DONE(d)")
+	(sequence "WAITING(w@/!)" "IDEA(i)" "SOMEDAY(s)" "|" "CANCELLED(c@/!)")))
 
 ;; Custom colors for the keywords
 (setq org-todo-keyword-faces
-      '(("TODO" :foreground "red" :weight bold)
-	("NEXT" :foreground "blue" :weight bold)
-	("PROJ" :foreground "magenta" :weight bold)
-	("DONE" :foreground "forest green" :weight bold)
-	("WAITING" :foreground "orange" :weight bold)
-	("INACTIVE" :foreground "magenta" :weight bold)
-	("SOMEDAY" :foreground "cyan" :weight bold)
-	("CANCELLED" :foreground "forest green" :weight bold)))
+      '(("TODO" :background "red" :weight bold)
+	("NEXT" :background "blue" :weight bold)
+	("PROJ" :background "magenta" :weight bold)
+	("DONE" :background "forest green" :weight bold)
+	("WAITING" :background "orange" :weight bold)
+	("INACTIVE" :background "magenta" :weight bold)
+	("SOMEDAY" :background "cyan" :weight bold)
+	("CANCELLED" :background "forest green" :weight bold)))
 
 ;; Set Tags
 (after! org
@@ -154,20 +159,51 @@
 ;; Org Agendas
 (setq org-agenda-start-with-log-mode t)
 
+;; (setq org-agenda-custom-commands
+;;       '(("p" "Planning"
+;;          ((tags-todo "+@planning"
+;;                      ((org-agenda-overriding-header "Planning Tasks")))
+;;           (tags-todo "-{.*}"
+;;                      ((org-agenda-overriding-header "Untagged Tasks")))
+;;           (todo ".*" ((org-agenda-files '("~/Notes/inbox.org"))
+;;                       (org-agenda-overriding-header "Unprocessed Inbox Items")))))
+
+;;         ("d" "Daily Agenda"
+;;          ((agenda "" ((org-agenda-span 'day)
+;;                       (org-deadline-warning-days 7)))
+;;           (tags-todo "+PRIORITY=\"A\""
+;;                      ((org-agenda-overriding-header "High Priority Tasks")))))
+
+;;         ("w" "Weekly Review"
+;;          ((agenda ""
+;;                   ((org-agenda-overriding-header "Completed Tasks")
+;;                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo 'done))
+;;                    (org-agenda-span 'week)))
+
+;;           (agenda ""
+;;                   ((org-agenda-overriding-header "Unfinished Scheduled Tasks")
+;;                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+;;                    (org-agenda-span 'week)))))))
+
 (setq org-agenda-custom-commands
       '(("p" "Planning"
          ((tags-todo "+@planning"
                      ((org-agenda-overriding-header "Planning Tasks")))
           (tags-todo "-{.*}"
                      ((org-agenda-overriding-header "Untagged Tasks")))
-          (todo ".*" ((org-agenda-files '("~/Notes/Inbox.org"))
+          (todo ".*" ((org-agenda-files '("~/Notes/inbox.org"))
                       (org-agenda-overriding-header "Unprocessed Inbox Items")))))
 
         ("d" "Daily Agenda"
          ((agenda "" ((org-agenda-span 'day)
-                      (org-deadline-warning-days 7)))
-          (tags-todo "+PRIORITY=\"A\""
-                     ((org-agenda-overriding-header "High Priority Tasks")))))
+                      (org-agenda-start-day ".")
+                      (org-agenda-start-on-weekday nil)
+                      (org-agenda-deadline-warning-days 0)
+                      (org-agenda-overriding-header "Today's Schedule and Deadlines")))
+          (todo "PROG"
+                ((org-agenda-overriding-header "In Progress Tasks")))
+          (todo "NEXT"
+                ((org-agenda-overriding-header "Next Tasks")))))
 
         ("w" "Weekly Review"
          ((agenda ""
@@ -179,3 +215,7 @@
                   ((org-agenda-overriding-header "Unfinished Scheduled Tasks")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-span 'week)))))))
+
+;; === Org Roam Customizations ===
+;; Ensure that Org Roam is available at startup
+(org-roam-db-autosync-mode)
