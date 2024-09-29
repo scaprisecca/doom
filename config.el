@@ -1,9 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; sync' after modifying this file!
-
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name "Scott Caprisecca"
@@ -81,7 +77,7 @@
 ;; Org Mode Customizations
 
 ;; Set Org Modern
-(with-eval-after-load 'org (global-org-modern-mode))
+;; (with-eval-after-load 'org (global-org-modern-mode))
 
 ;; Hide bold, italic, code symbols
 (setq org-hide-emphasis-markers t)
@@ -133,11 +129,11 @@
 
 ;; Custom colors for the keywords
 (setq org-todo-keyword-faces
-      '(("TODO" :background "red" :weight bold)
-	("NEXT" :background "blue" :weight bold)
-	("PROJ" :background "magenta" :weight bold)
+      '(("TODO" :background "green" :weight bold)
+	("NEXT" :background "purple" :weight bold)
+	("PROJ" :background "red" :weight bold)
 	("DONE" :background "forest green" :weight bold)
-	("WAITING" :background "orange" :weight bold)
+	("WAITING" :background "yellow" :weight bold)
 	("INACTIVE" :background "magenta" :weight bold)
 	("SOMEDAY" :background "cyan" :weight bold)
 	("CANCELLED" :background "forest green" :weight bold)))
@@ -145,46 +141,25 @@
 ;; Set Tags
 (after! org
   org-tag-alist
-  '(("home" . ?h)
-    ("office" . ?o)
-    ("backyard" . ?b)
-    ("idea" . ?i)
-    ("errand" . ?e)
-    ("homedepot" . ?d)
-    ("walmart" . ?w)
-    ("amazon" . ?a)))
+  '(("@Home" . ?h)
+    ("@Backyard" . ?b)
+    ("@Office" . ?o)
+    ("@Frontyard" . ?f)
+    ("@Errand" . ?e)
+    ("@HomeDepot" . ?d)
+    ("@Walmart" . ?w)
+    ("@Amazon" . ?a)
+    ("@Computer" . ?c)
+    ("@Phone" . ?p)
+    ("@Call" . ?C)))
+
 
 ;; Org Agenda Deadline Warning
 ;;(setq org-deadline-warning-days 1)
 ;; Org Agendas
 (setq org-agenda-start-with-log-mode t)
 
-;; (setq org-agenda-custom-commands
-;;       '(("p" "Planning"
-;;          ((tags-todo "+@planning"
-;;                      ((org-agenda-overriding-header "Planning Tasks")))
-;;           (tags-todo "-{.*}"
-;;                      ((org-agenda-overriding-header "Untagged Tasks")))
-;;           (todo ".*" ((org-agenda-files '("~/Notes/inbox.org"))
-;;                       (org-agenda-overriding-header "Unprocessed Inbox Items")))))
-
-;;         ("d" "Daily Agenda"
-;;          ((agenda "" ((org-agenda-span 'day)
-;;                       (org-deadline-warning-days 7)))
-;;           (tags-todo "+PRIORITY=\"A\""
-;;                      ((org-agenda-overriding-header "High Priority Tasks")))))
-
-;;         ("w" "Weekly Review"
-;;          ((agenda ""
-;;                   ((org-agenda-overriding-header "Completed Tasks")
-;;                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo 'done))
-;;                    (org-agenda-span 'week)))
-
-;;           (agenda ""
-;;                   ((org-agenda-overriding-header "Unfinished Scheduled Tasks")
-;;                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-;;                    (org-agenda-span 'week)))))))
-
+;; === Configuration for regualr Org Agenda ===
 (setq org-agenda-custom-commands
       '(("p" "Planning"
          ((tags-todo "+@planning"
@@ -208,6 +183,7 @@
         ("w" "Weekly Review"
          ((agenda ""
                   ((org-agenda-overriding-header "Completed Tasks")
+
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'nottodo 'done))
                    (org-agenda-span 'week)))
 
@@ -219,3 +195,60 @@
 ;; === Org Roam Customizations ===
 ;; Ensure that Org Roam is available at startup
 (org-roam-db-autosync-mode)
+
+
+;; === Configuration for Org Super Agenda Views ===
+(use-package org-super-agenda
+  :config
+  (org-super-agenda-mode))
+
+(setq org-agenda-custom-commands
+      '(("d" "Daily Agenda"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-agenda-start-day ".")
+                      (org-agenda-start-on-weekday nil)
+                      (org-super-agenda-groups
+                       '((:name "Schedule"
+                          :time-grid t
+                          :date today
+                          :scheduled today
+                          :order 1)
+                         (:name "Due today"
+                          :deadline today
+                          :order 2)
+                         (:name "In Progress"
+                          :todo "PROG"
+                          :order 3)
+                         (:name "Next Tasks"
+                          :todo "NEXT"
+                          :order 4)
+                         (:discard (:anything t))))
+                      (org-agenda-overriding-header "Today's Agenda")))))
+
+        ("p" "Planning View"
+         ((agenda ""
+                  ((org-agenda-span 7)  ; 7 day span
+                   (org-super-agenda-groups
+                    '((:name "Deadlines"
+                       :deadline t
+                       :order 1)
+                      (:name "Scheduled"
+                       :scheduled t
+                       :order 2)
+                      (:name "NEXT Tasks"
+                       :todo "NEXT"
+                       :order 3)
+                      (:name "Untagged TODOs"
+                       :and (:todo "TODO" :not (:tag (".")))
+                       :order 4)
+                      (:discard (:anything t))))
+                   (org-agenda-overriding-header "Planning View")))))
+
+        ("P" "Projects"
+         ((alltodo ""
+                   ((org-agenda-files '("~/Sync/Notes/org-notes/projects.org"))
+                    (org-super-agenda-groups
+                     '((:auto-parent t)
+                       (:discard (:anything t))))
+                    (org-agenda-prefix-format "  %t %s")
+                    (org-agenda-overriding-header "Projects")))))))
